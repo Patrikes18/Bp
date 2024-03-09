@@ -1,9 +1,54 @@
 <script setup lang="ts">
-import TheWelcome from '../components/TheWelcome.vue'
+import { RouterLink } from 'vue-router'
+
 </script>
 
 <template>
-  <main>
-    <TheWelcome />
-  </main>
+	<div class="flex justify-center gap-40 my-40">
+		<RouterLink to="/learn" >
+			<div class="container">
+				<img width="300px" style="border-radius: 50px" src="../assets/open-book.jpg" alt="Výuka fuzzy frakcionálneho farbenia"/>
+				<div class="middle">
+					<div class="text">Výuka</div>
+				</div>
+			</div>
+		</RouterLink>
+		<RouterLink to="/calc">
+			<div class="container">
+				<img width="300px" style="border-radius: 50px" src="../assets/calc.jpg" alt="Kalkulačka fuzzy frakcionálneho farbenia"/>
+				<div class="middle">
+					<div class="text">Kalkulačka</div>
+				</div>
+			</div>
+		</RouterLink>
+	</div>
 </template>
+
+
+<style scoped>
+	.container {
+		position: relative;
+	}
+
+	.middle {
+		transition: .5s ease;
+		opacity: 0;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		-ms-transform: translate(-50%, -50%);
+		text-align: center;
+	}
+
+	.container:hover .middle {
+		opacity: 1;
+	}
+
+	.text {
+		background-color: gray;
+		color: white;
+		font-size: 16px;
+		padding: 16px 32px;
+	}
+</style>
