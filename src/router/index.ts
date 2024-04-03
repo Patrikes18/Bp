@@ -19,11 +19,26 @@ const router = createRouter({
     },
     {
       path: '/learn',
+	  redirect: {path: '/learn/introduct'},
       name: 'learner',
       // route level code-splitting
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import('../views/LearnView.vue')
+      component: () => import('../views/LearnView.vue'),
+      children: [
+        {
+          path: 'introduct',
+          component: () => import('../views/learnPages/IntroductionView.vue'),
+        },
+        {
+          path: 'strong',
+          component: () => import('../views/learnPages/StrongView.vue'),
+        },
+        {
+          path: 'independent',
+          component: () => import('../views/learnPages/IndependentView.vue'),
+        },
+      ]
     }
   ]
 })
