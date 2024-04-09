@@ -38,6 +38,26 @@ const router = createRouter({
           path: 'independent',
           component: () => import('../views/learnPages/IndependentView.vue'),
         },
+        {
+          path: 'linear',
+          component: () => import('../views/learnPages/LinearView.vue'),
+        },
+        {
+          path: 'linear2',
+          component: () => import('../views/learnPages/Linear2View.vue'),
+        },
+        {
+          path: 'weights',
+          component: () => import('../views/learnPages/WeightsView.vue'),
+        },
+        {
+          path: 'weak',
+          component: () => import('../views/learnPages/WeakView.vue'),
+        },
+        {
+          path: 'result',
+          component: () => import('../views/learnPages/ResultView.vue'),
+        },
       ]
     }
   ]
