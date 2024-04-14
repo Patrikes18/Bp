@@ -2,7 +2,6 @@
 </script>
 
 <template>
-    <div class="flex justify-center border-solid border-2 p-8 my-20 mx-32 bg-white">
 		<div class="flex flex-wrap flex-col gap-8">
 			<p class="font-sans text-2xl font-bold text-center">Lineárne programovanie s využitím simplexovej metódy 2</p>
             <div>
@@ -17,5 +16,4 @@
                 <p class="mx-20">x<sub>5</sub> = S<sub>5</sub> = 0,5.</p>
             </div>
 		</div>
-	</div>
 </template>

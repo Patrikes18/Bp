@@ -2,7 +2,6 @@
 </script>
 
 <template>
-    <div class="flex justify-center border-solid border-2 p-8 my-20 mx-32 bg-white">
 		<div class="flex flex-wrap flex-col gap-8">
 			<p class="font-sans text-2xl font-bold text-center">Lineárne programovanie s využitím simplexovej metódy</p>
 			<div class="grid grid-cols-2 gap-8 mx-16">
@@ -31,5 +30,4 @@
                 </div>
 			</div>
 		</div>
-	</div>
 </template>
