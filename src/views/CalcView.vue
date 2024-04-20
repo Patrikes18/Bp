@@ -28,6 +28,7 @@
 	const selected1 = ref('')
 	const selected2 = ref('')
 	const edgeval = ref(0)
+	const errmessage = ref('')
 
 	const options1 = computed(() => {return Array.from(vertices.value.keys())})
 	const options2 = computed(() => {
@@ -37,18 +38,33 @@
 			})
 	})
 
-
-
 	async function call() {
 		console.log("CALL", JSON.stringify({ vertices: Object.fromEntries(vertices.value), edges: edges.value }))
-		data.value = await (await fetch('http://127.0.0.1:5000', {
+		const res = await fetch('http://127.0.0.1:5000', {
 		method: 'POST',
 		headers: {'Content-Type': 'application/json'}, 
 		body: JSON.stringify({ vertices: Object.fromEntries(vertices.value), edges: edges.value })
-		})).text()
-		console.log(data.value)
+		})
+		if (res.ok) {
+			data.value = await res.text()
+		}
+		else {
+			if (res.status != 500) {
+				const tmp = await res.json()
+				console.log(tmp)
+				errmessage.value = tmp["message"]
+			}
+			else {
+				errmessage.value = "Internal server error"
+			}
+		}
 	}
 
+	function isSVGData(res: string) {
+		const blob = new Blob([res]);
+		const type = blob.type;
+		return type === 'image/svg+xml';
+	}
 
 	function addVertex(){
         vertices.value.set(vertexname.value, vertexvalue.value)
@@ -80,6 +96,7 @@
 		const blob = new Blob([JSON.stringify({ vertices: Object.fromEntries(vertices.value), edges: edges.value })], { type: 'application/json' });
 		saveAs(blob, 'graphData.json');
 	}
+
 	function uploadFile(event: any){
 		const file = event.target.files[0];
 		const reader = new FileReader();
@@ -102,22 +119,21 @@
 </script>
 
 <template>
-	<div class="flex flex-col gap-8 mx-16">
+	<div class="flex flex-col gap-8 mx-16 p-8">
 		<div class="flex gap-10 flex-wrap justify-center pt-5">
 			<input type="file" @change="uploadFile">
 			<button @click="saveInput" class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Exportovať dáta typu JSON</button>
 		</div>
-		<div class="flex gap-10 w-full flex-wrap justify-center">
+		<div class="flex gap-10 flex-wrap justify-center p-8 mx-16">
 			<div class="flex flex-col gap-4">
-				<input v-model="vertexname" type="text">
-			
+				<input v-model="vertexname" type="text" placeholder="Zadajte vrchol">
 				<input v-model="vertexvalue" type="number">
 				<button @click="addVertex" :disabled="!(vertices.get(vertexname) === undefined && vertexname.length != 0 && vertexvalue >= 0 && vertexvalue <= 1)" class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Pridať vrchol</button>
 				<div v-if="vertices.get(vertexname) != undefined && vertexname.length != 0">
-					<p class="mt-2 font-bold text-red-900 dark:text-red-500">Daný vrchol už existuje</p>
+					<p class="mt-2 font-bold dark:text-red-500">Daný vrchol už existuje</p>
 				</div>
 				<div v-if="vertexvalue < 0 || vertexvalue > 1">
-					<p class="mt-2 font-bold text-red-900 dark:text-red-500">Váha vrcholu je mimo intervalu [0, 1]</p>
+					<p class="mt-2 font-bold dark:text-red-500">Váha vrcholu je mimo intervalu [0, 1]</p>
 				</div>
 			</div>
 			<div class="flex flex-wrap flex-col">
@@ -128,15 +144,17 @@
 			</div>
 		</div>
 
-		<div class="flex gap-10 w-full flex-wrap justify-center">
+		<div class="flex gap-10 flex-wrap justify-center p-8 mx-16">
 			<div class="flex flex-col gap-4">
 				<select v-model="selected1">
+					<option value="" disabled hidden>Vyberte si prvý vrchol</option>
 					<option v-for="option in options1" v-bind:key="option">
 						{{ option }}
 					</option>
 				</select>
 
 				<select v-model="selected2">
+					<option value="" disabled hidden>Vyberte si druhý vrchol</option>
 					<option v-for="option in options2" v-bind:key="option">
 						{{ option }}
 					</option>
@@ -144,10 +162,10 @@
 				<input v-model="edgeval" type="number">
 				<button @click="addEdge" :disabled="!(edgeval >= 0 && edgeval <= 1 && edgeval <= Math.min(vertices.get(selected1) ?? 0, vertices.get(selected2) ?? 0))" class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Pridať hranu</button>
 				<div v-if="edgeval < 0 || edgeval > 1">
-					<p class="mt-2 font-bold text-red-900 dark:text-red-500">Váha hrany je mimo intervalu [0, 1]</p>
+					<p class="mt-2 font-bold dark:text-red-500">Váha hrany je mimo intervalu [0, 1]</p>
 				</div>
 				<div v-if="edgeval > Math.min(vertices.get(selected1) ?? 0, vertices.get(selected2) ?? 0)">
-					<p class="mt-2 font-bold text-red-900 dark:text-red-500">Váha hrany je väčšia ako minimum z vrcholov <span class="italic">{{ selected1 }}</span> a <span class="italic">{{ selected2 }}</span></p>
+					<p class="mt-2 font-bold dark:text-red-500">Váha hrany je väčšia ako minimum z vrcholov <span class="italic">{{ selected1 }}</span> a <span class="italic">{{ selected2 }}</span></p>
 				</div>
 			</div>
 			<div class="flex flex-wrap flex-col">
@@ -161,9 +179,16 @@
 			<button @click="call" class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Poslať</button>
 		</div>
 
-		<div class="border my-8" v-html="data"></div>
-		<div v-if="data" class="flex justify-center">
-			<button @click="saveFile" class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Uložiť graf</button>
+		<div v-if="isSVGData(data)">
+			<div class="border my-8" v-html="data"></div>
+			<div v-if="isSVGData(data)" class="flex justify-center">
+				<button @click="saveFile" class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Uložiť graf</button>
+			</div>
+		</div>
+		<div v-else>
+			<div class="text-red-500 font-bold">
+				{{ errmessage }}
+			</div>
 		</div>
 	</div>
 </template>

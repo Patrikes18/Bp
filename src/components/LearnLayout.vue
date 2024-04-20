@@ -2,7 +2,7 @@
     
     <div class="w-full">
         <div class="h-full my-5">
-            <div class="custom-h bg-white mx-16 p-8 text-lg">
+            <div class="custom-h bg-white mx-16 p-16 text-lg">
                 <slot name="content"/>
     
             </div>

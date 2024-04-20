@@ -7,12 +7,17 @@
 	const routes = {
 		1: "/learn/introduct", 
 		2: "/learn/strong",
-		3: "/learn/independent",
-		4: "/learn/linear",
-		5: "/learn/linear2",
-		6: "/learn/weights",
-		7: "/learn/weak",
-		8: "/learn/result"
+		3: "/learn/strong2",
+		4: "/learn/strong3",
+		5: "/learn/independent",
+		6: "/learn/independent2",
+		7: "/learn/independent3",
+		8: "/learn/linear",
+		9: "/learn/linear2",
+		10: "/learn/weights",
+		11: "/learn/color",
+		12: "/learn/weak",
+		13: "/learn/result"
 	}
 
 	const route = useRoute()

@@ -35,8 +35,24 @@ const router = createRouter({
           component: () => import('../views/learnPages/StrongView.vue'),
         },
         {
+          path: 'strong2',
+          component: () => import('../views/learnPages/Strong2View.vue'),
+        },
+        {
+          path: 'strong3',
+          component: () => import('../views/learnPages/Strong3View.vue'),
+        },
+        {
           path: 'independent',
           component: () => import('../views/learnPages/IndependentView.vue'),
+        },
+        {
+          path: 'independent2',
+          component: () => import('../views/learnPages/Independent2View.vue'),
+        },
+        {
+          path: 'independent3',
+          component: () => import('../views/learnPages/Independent3View.vue'),
         },
         {
           path: 'linear',
@@ -49,6 +65,10 @@ const router = createRouter({
         {
           path: 'weights',
           component: () => import('../views/learnPages/WeightsView.vue'),
+        },
+        {
+          path: 'color',
+          component: () => import('../views/learnPages/ColorView.vue'),
         },
         {
           path: 'weak',
