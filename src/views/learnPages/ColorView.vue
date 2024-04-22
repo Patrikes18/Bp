@@ -6,7 +6,7 @@
 			<p class="font-sans text-2xl font-bold text-center">Priradenie farieb</p>
             <div>
                 <ul class="list-disc">
-                    <li>Poznáme váhu farieb jednotlivých nezávislých množín a teraz k množinám priradíme farby</li>
+                    <li>Poznáme váhu farieb jednotlivých nezávislých množín a teraz k množinám priradíme farby:</li>
                     <ul class="list-disc mx-10"  style="list-style-type: circle">
                         <li>S<sub>1</sub> = červená</li>
                         <li>S<sub>2</sub> = žltá</li>

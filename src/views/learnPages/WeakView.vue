@@ -6,7 +6,7 @@
 			<p class="font-sans text-2xl font-bold text-center">Slabo susediace vrcholy</p>
             <div>
                 <ul class="list-disc">
-                    <li>Poznáme už farby a aj váhy farieb silne susediacich vrcholov. Slabo susediacim vrcholom budeme farby priraďovať na základe toho, s ktorým vrcholom je množstvo sily najmenšie. Množstvo sily budeme počítať takto:</li>
+                    <li>Slabo susediacim vrcholom budeme farby priraďovať na základe toho, s ktorým vrcholom je množstvo sily najmenšie. Množstvo sily budeme počítať takto:</li>
                     <math display="block">
                         <mtext>I(a, b)</mtext>
                         <mtd>

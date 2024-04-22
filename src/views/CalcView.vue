@@ -29,6 +29,8 @@
 	const selected2 = ref('')
 	const edgeval = ref(0)
 	const errmessage = ref('')
+	const filetest = ref(true)
+	const filemessage = ref('')
 
 	const options1 = computed(() => {return Array.from(vertices.value.keys())})
 	const options2 = computed(() => {
@@ -40,12 +42,13 @@
 
 	async function call() {
 		console.log("CALL", JSON.stringify({ vertices: Object.fromEntries(vertices.value), edges: edges.value }))
-		const res = await fetch('http://127.0.0.1:5000', {
+		const res = await fetch(import.meta.env.VITE_API_URL, {
 		method: 'POST',
 		headers: {'Content-Type': 'application/json'}, 
 		body: JSON.stringify({ vertices: Object.fromEntries(vertices.value), edges: edges.value })
 		})
 		if (res.ok) {
+			errmessage.value = "No error"
 			data.value = await res.text()
 		}
 		else {
@@ -60,10 +63,19 @@
 		}
 	}
 
-	function isSVGData(res: string) {
-		const blob = new Blob([res]);
-		const type = blob.type;
-		return type === 'image/svg+xml';
+	function testAddVertex() {
+		return !(vertices.value.get(vertexname.value) === undefined && vertexname.value.length != 0 && vertexvalue.value >= 0 && vertexvalue.value <= 1)
+	}
+
+	function testAddEdge() {
+		return !(edgeval.value >= 0 && edgeval.value <= 1 && edgeval.value <= Math.min(vertices.value.get(selected1.value) ?? 0, vertices.value.get(selected2.value) ?? 0))
+	}
+
+	function testSend() {
+		if (vertices.value.size == 0) {
+			return true
+		}
+		return false
 	}
 
 	function addVertex(){
@@ -101,14 +113,36 @@
 		const file = event.target.files[0];
 		const reader = new FileReader();
 		reader.onload = (evt: any) => {
-			const res = JSON.parse(evt.target.result)
-			vertices.value = new Map<string, number>()
-			for (const key in res["vertices"]){
-				vertices.value.set(key, res["vertices"][key])
-			}
-			edges.value = []
-			for (const value of res["edges"]){
-				edges.value.push(new Edge(value["vertices"][0], value["vertices"][1], value["value"]))
+			try {
+				filetest.value = true
+				const res = JSON.parse(evt.target.result)
+				vertices.value = new Map<string, number>()
+				for (const key in res["vertices"]){
+					console.log(vertices.value.has(key) + "  " + key) 
+					if (!vertices.value.has(key) && res["vertices"][key] >= 0 && res["vertices"][key] <= 1) {
+						vertices.value.set(key, res["vertices"][key])
+					}
+					else {
+						vertices.value = new Map<string, number>()
+						filemessage.value = "vertex"
+						throw new Error("vertex")
+					}
+				}
+				edges.value = []
+				for (const value of res["edges"]){
+					if (vertices.value.has(value["vertices"][0]) && vertices.value.has(value["vertices"][1]) && value["vertices"][0] != value["vertices"][1] && 
+						value["value"] >= 0 && value["value"] <= Math.min((vertices.value.get(value["vertices"][0]) ?? 0) && (vertices.value.get(value["vertices"][1]) ?? 0))) {
+						edges.value.push(new Edge(value["vertices"][0], value["vertices"][1], value["value"]))
+					} else {
+						vertices.value = new Map<string, number>()
+						edges.value = []
+						filemessage.value = "edge"
+						throw new Error("edge")
+					}
+					
+				}
+			} catch (e:any) {
+				filetest.value = false
 			}
 		};
 		reader.readAsText(file);
@@ -121,14 +155,31 @@
 <template>
 	<div class="flex flex-col gap-8 mx-16 p-8">
 		<div class="flex gap-10 flex-wrap justify-center pt-5">
-			<input type="file" @change="uploadFile">
+			<div>
+				<input type="file" @change="uploadFile">
+				<div v-if="!filetest && filemessage == 'vertex'">
+					<p class="mt-2 font-bold dark:text-red-500">Chybné dáta vrcholov</p>
+				</div>
+				<div v-else-if="!filetest && filemessage == 'edge'">
+					<p class="mt-2 font-bold dark:text-red-500">Chybné dáta hrán</p>
+				</div>
+				<div v-else-if="!filetest">
+					<p class="mt-2 font-bold dark:text-red-500">Chybný formát súboru</p>
+				</div>
+			</div>
 			<button @click="saveInput" class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Exportovať dáta typu JSON</button>
 		</div>
 		<div class="flex gap-10 flex-wrap justify-center p-8 mx-16">
 			<div class="flex flex-col gap-4">
-				<input v-model="vertexname" type="text" placeholder="Zadajte vrchol">
-				<input v-model="vertexvalue" type="number">
-				<button @click="addVertex" :disabled="!(vertices.get(vertexname) === undefined && vertexname.length != 0 && vertexvalue >= 0 && vertexvalue <= 1)" class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Pridať vrchol</button>
+				<div class="flex flex-row gap-8 justify-between">
+					<label>Zadajte názov vrcholu:</label>
+					<input v-model="vertexname" type="text">
+				</div>
+				<div class="flex flex-row gap-8 justify-between">
+					<label>Zadajte váhu vrcholu:</label>
+					<input v-model="vertexvalue" type="number">
+				</div>
+				<button @click="addVertex" :disabled="testAddVertex()" class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Pridať vrchol</button>
 				<div v-if="vertices.get(vertexname) != undefined && vertexname.length != 0">
 					<p class="mt-2 font-bold dark:text-red-500">Daný vrchol už existuje</p>
 				</div>
@@ -146,21 +197,28 @@
 
 		<div class="flex gap-10 flex-wrap justify-center p-8 mx-16">
 			<div class="flex flex-col gap-4">
-				<select v-model="selected1">
-					<option value="" disabled hidden>Vyberte si prvý vrchol</option>
-					<option v-for="option in options1" v-bind:key="option">
-						{{ option }}
-					</option>
-				</select>
+				<div class="flex flex-row gap-8 justify-between">
+					<label>Vyberte prvý vrchol hrany:</label>
+					<select v-model="selected1" class="min-w-36">
+						<option v-for="option in options1" v-bind:key="option">
+							{{ option }}
+						</option>
+					</select>
+				</div>
 
-				<select v-model="selected2">
-					<option value="" disabled hidden>Vyberte si druhý vrchol</option>
-					<option v-for="option in options2" v-bind:key="option">
-						{{ option }}
-					</option>
-				</select>
-				<input v-model="edgeval" type="number">
-				<button @click="addEdge" :disabled="!(edgeval >= 0 && edgeval <= 1 && edgeval <= Math.min(vertices.get(selected1) ?? 0, vertices.get(selected2) ?? 0))" class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Pridať hranu</button>
+				<div class="flex flex-row gap-8 justify-between">
+					<label>Vyberte druhý vrchol hrany:</label>
+					<select v-model="selected2" class="min-w-36">
+						<option v-for="option in options2" v-bind:key="option">
+							{{ option }}
+						</option>
+					</select>
+				</div>
+				<div class="flex flex-row gap-8 justify-between">
+					<label>Zadajte váhu hrany:</label>
+					<input v-model="edgeval" type="number">
+				</div>
+				<button @click="addEdge" :disabled="testAddEdge()" class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Pridať hranu</button>
 				<div v-if="edgeval < 0 || edgeval > 1">
 					<p class="mt-2 font-bold dark:text-red-500">Váha hrany je mimo intervalu [0, 1]</p>
 				</div>
@@ -176,12 +234,12 @@
 			</div>
 		</div>
 		<div class="flex flex-col gap-4">
-			<button @click="call" class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Poslať</button>
+			<button @click="call" :disabled="testSend()" class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Poslať</button>
 		</div>
 
-		<div v-if="isSVGData(data)">
+		<div v-if="errmessage == 'No error'">
 			<div class="border my-8" v-html="data"></div>
-			<div v-if="isSVGData(data)" class="flex justify-center">
+			<div class="flex justify-center">
 				<button @click="saveFile" class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Uložiť graf</button>
 			</div>
 		</div>
