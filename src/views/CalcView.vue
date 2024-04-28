@@ -1,34 +1,18 @@
 <script setup lang="ts">
-	import { ref, computed, watch } from "vue";
+	import { ref, computed } from "vue";
 	import { saveAs, encodeBase64  } from "@progress/kendo-file-saver";
+	import { sendToAPI } from "@/services/ServerService" 
+	import { Edge } from "@/models/EdgeModel"
 	
-	class Edge{
-    vertices: [string, string]
-    value: number
-
-    constructor(v1: string, v2: string, value: number){
-        this.vertices = [v1,v2]
-        this.value = value
-    }
-
-    public hasVertices(v1: string, v2: string): boolean{
-        return (this.vertices[0] == v1 && this.vertices[1] == v2) || (this.vertices[0] == v2 && this.vertices[1] == v1)
-    }
-
-	public hasVertex(v: string): boolean{
-        return this.vertices[0] == v || this.vertices[1] == v
-    }
-}
 	const vertices = ref(new Map<string, number>())
 	const edges = ref<Edge[]>([])
-	const data = ref('')
+	const ret = ref(["", ""])
 	const vertexname = ref('')
 	const vertexvalue = ref(0)
 
 	const selected1 = ref('')
 	const selected2 = ref('')
 	const edgeval = ref(0)
-	const errmessage = ref('')
 	const filetest = ref(true)
 	const filemessage = ref('')
 
@@ -40,27 +24,8 @@
 			})
 	})
 
-	async function call() {
-		console.log("CALL", JSON.stringify({ vertices: Object.fromEntries(vertices.value), edges: edges.value }))
-		const res = await fetch(import.meta.env.VITE_API_URL, {
-		method: 'POST',
-		headers: {'Content-Type': 'application/json'}, 
-		body: JSON.stringify({ vertices: Object.fromEntries(vertices.value), edges: edges.value })
-		})
-		if (res.ok) {
-			errmessage.value = "No error"
-			data.value = await res.text()
-		}
-		else {
-			if (res.status != 500) {
-				const tmp = await res.json()
-				console.log(tmp)
-				errmessage.value = tmp["message"]
-			}
-			else {
-				errmessage.value = "Internal server error"
-			}
-		}
+	async function callAPI() {
+		ret.value = await sendToAPI(vertices.value, edges.value)
 	}
 
 	function testAddVertex() {
@@ -82,12 +47,9 @@
         vertices.value.set(vertexname.value, vertexvalue.value)
         vertexname.value = ""
         vertexvalue.value = 0
-		console.log(vertices.value)
-		// console.log(options1.value)
 	}
 
 	function removeVertex(vertex: string){
-		console.log(vertex)
 		vertices.value.delete(vertex)
 		edges.value = edges.value.filter((x) => !x.hasVertex(vertex))
 	}
@@ -100,7 +62,7 @@
 	}
 
 	function saveFile(){
-		const dataURI = "data:text/plain;base64," + encodeBase64(data.value);
+		const dataURI = "data:text/plain;base64," + encodeBase64(ret.value[1]);
 		saveAs(dataURI, "graph.svg")
 	}
 
@@ -117,8 +79,8 @@
 				filetest.value = true
 				const res = JSON.parse(evt.target.result)
 				vertices.value = new Map<string, number>()
+				edges.value = []
 				for (const key in res["vertices"]){
-					console.log(vertices.value.has(key) + "  " + key) 
 					if (!vertices.value.has(key) && res["vertices"][key] >= 0 && res["vertices"][key] <= 1) {
 						vertices.value.set(key, res["vertices"][key])
 					}
@@ -128,7 +90,6 @@
 						throw new Error("vertex")
 					}
 				}
-				edges.value = []
 				for (const value of res["edges"]){
 					if (vertices.value.has(value["vertices"][0]) && vertices.value.has(value["vertices"][1]) && value["vertices"][0] != value["vertices"][1] && 
 						value["value"] >= 0 && value["value"] <= Math.min((vertices.value.get(value["vertices"][0]) ?? 0) && (vertices.value.get(value["vertices"][1]) ?? 0))) {
@@ -147,8 +108,6 @@
 		};
 		reader.readAsText(file);
 	};
-
-	watch(selected1, () => console.log(options2.value))
 
 </script>
 
@@ -234,18 +193,18 @@
 			</div>
 		</div>
 		<div class="flex flex-col gap-4">
-			<button @click="call" :disabled="testSend()" class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Poslať</button>
+			<button @click="callAPI" :disabled="testSend()" class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Poslať</button>
 		</div>
 
-		<div v-if="errmessage == 'No error'">
-			<div class="border my-8" v-html="data"></div>
+		<div v-if="ret[0] == 'ok'">
+			<div class="border my-8" v-html="ret[1]"></div>
 			<div class="flex justify-center">
 				<button @click="saveFile" class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Uložiť graf</button>
 			</div>
 		</div>
 		<div v-else>
 			<div class="text-red-500 font-bold">
-				{{ errmessage }}
+				{{ ret[1] }}
 			</div>
 		</div>
 	</div>
