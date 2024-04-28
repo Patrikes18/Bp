@@ -3,8 +3,9 @@
     <div class="w-full">
         <div class="h-full my-5">
             <div class="custom-h bg-white mx-16 p-16 text-lg">
-                <slot name="content"/>
-    
+                <div class="flex flex-wrap flex-col gap-8 h-full items-center">
+                    <slot name="content"/>
+                </div>
             </div>
 
         </div>

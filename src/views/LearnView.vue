@@ -38,15 +38,6 @@
 		</template>
 		<template v-slot:navbar>
 			<div class="flex gap-4 justify-center w-full">
-				<!-- <RouterLink to="/learn/introduct">1</RouterLink>
-				<RouterLink to="/learn/strong">2</RouterLink>
-				<RouterLink to="/learn/independent">3</RouterLink>
-				<RouterLink to="/learn/linear">4</RouterLink>
-				<RouterLink to="/learn/linear2">5</RouterLink>
-				<RouterLink to="/learn/weights">6</RouterLink>
-				<RouterLink to="/learn/weak">7</RouterLink>
-				<RouterLink to="/learn/result">8</RouterLink> -->
-		
 				<RouterLink v-for="(value, key) in routes" v-bind:key="key" :to="value" :class="active == value ? 'text-red-700 ':''" 
 				class="transition ease-in-out hover:-translate-y-1 hover:scale-110 duration-300 px-2 py-1 rounded-xl text-xl">
 					{{ key }}
