@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { RouterLink } from 'vue-router'
-
+	import { RouterLink } from 'vue-router'
 </script>
 
 <template>
 	<div class="flex justify-center gap-40 my-40">
 		<RouterLink to="/learn" >
+			<!-- Karta, ktorá presmerúva na časť s výukou. -->
 			<div class="container">
 				<img width="300px" style="border-radius: 50px" src="../assets/open-book.jpg" alt="Výuka fuzzy frakcionálneho farbenia"/>
 				<div class="middle">
@@ -13,7 +13,9 @@ import { RouterLink } from 'vue-router'
 				</div>
 			</div>
 		</RouterLink>
+
 		<RouterLink to="/calc">
+			<!-- Karta, ktorá presmerúva na časť s kalkulačkou. -->
 			<div class="container">
 				<img width="300px" style="border-radius: 50px" src="../assets/calc.jpg" alt="Kalkulačka fuzzy frakcionálneho farbenia"/>
 				<div class="middle">

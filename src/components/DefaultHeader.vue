@@ -1,9 +1,9 @@
 <script setup lang="ts">
-
 </script>
 
 <template>
     <header>
+        <!-- Základná hlavička aplikácie. -->
         <nav class="flex py-5 dark:bg-gray-900 w-screen">
             <div class="flex flex-wrap  flex-col w-full">
                 <div class="flex items-center justify-center items-center w-full">

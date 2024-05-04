@@ -4,6 +4,9 @@
 
 	import Layout from '@/components/LearnLayout.vue';
 
+	/**
+	 * Zoznam stránok pre výuku.
+	 */
 	const routes = {
 		1: "/learn/introduct", 
 		2: "/learn/strong",
@@ -26,8 +29,6 @@
 	router.beforeEach((to) =>{
 		active.value = to.path
 	})
-	
-
 
 </script>
 
