@@ -18,4 +18,4 @@ Pre preklad klientskej časti je potrebné mať nainštalovaný Node.js a npm (a
 
 # Terajšie nasadenie klientskej časti
 
-Klientská časť je momentálne nasadená na školskom serveri. Môžete sa na klientskú časť dostať pomocou tohto [odkazu](https://www.stud.fit.vutbr.cz/~xducky00/bp/).
+Na klientskú časť sa môžete dostať pomocou tohto [odkazu](https://www.stud.fit.vutbr.cz/~xducky00/bp/).

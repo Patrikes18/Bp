@@ -87,7 +87,7 @@
 	 * Funkcia, ktorá blokuje tlačítko, ktoré pridáva hrany, ak je hrana chybná.
 	 */
 	function testAddEdge() {
-		return !(edgeval.value >= 0 && edgeval.value <= Math.min(vertices.value.get(selected1.value) ?? 0, vertices.value.get(selected2.value) ?? 0))
+		return !(edgeval.value >= 0 && edgeval.value <= Math.min(vertices.value.get(selected1.value) ?? 0, vertices.value.get(selected2.value) ?? 0) && selected1.value != "" && selected2.value != "")
 	}
 
 	/**
