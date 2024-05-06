@@ -76,6 +76,10 @@ const router = createRouter({
 					component: () => import('../views/learnPages/ResultView.vue'),
 				},
 			]
+		},
+		{
+			path: '/:pathMatch(.*)*',
+			redirect: '/'
 		}
 	]
 })

@@ -1,46 +1,21 @@
-# Bp
+# Klientská časť pre fuzzy frakcionálne farbenie
 
-This template should help get you started developing with Vue 3 in Vite.
+Táto zložka obsahuje zdrojové kódy pre klientskú časť.
 
-## Recommended IDE Setup
+# Návod na nasadenie
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+Pre preklad klientskej časti je potrebné mať nainštalovaný Node.js a npm (alebo iné podľa zváženia).
+1. V adresári Bp/ spustite príkaz:
+    ```bash
+    npm install
+    ```
+2. V súbore .env nastavte premenne tak, aby VITE_API_URL smerovala na IP adresu API a VITE_BASE_URL odpovedalo ceste na servere, kde bude klientska čast umiestnená.
+3. Preložte aplikáciu do nasaditeľnej podoby pomocou príkazu:
+    ```bash
+    npm run build
+    ```
+4. Všetky preložené súbory, ktoré sa nachádzajú v zložke dist presuňte na server typu nginx alebo Apache.
 
-## Type Support for `.vue` Imports in TS
+# Terajšie nasadenie klientskej časti
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
-
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
-
-1. Disable the built-in TypeScript Extension
-    1) Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-    2) Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+Klientská časť je momentálne nasadená na školskom serveri. Môžete sa na klientskú časť dostať pomocou tohto [odkazu](https://www.stud.fit.vutbr.cz/~xducky00/bp/).
